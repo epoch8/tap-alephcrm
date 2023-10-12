@@ -8,6 +8,7 @@ plugins:
   extractors:
   - name: "tap-alephcrm"
     namespace: "tap_alephcrm"
+    # pip_url: git+https://github.com/epoch8/tap-alephcrm.git
     pip_url: -e .
     capabilities:
     - state
@@ -15,15 +16,9 @@ plugins:
     - discover
     - about
     - stream-maps
-    config:
-      start_date: '2010-01-01T00:00:00Z'
     settings:
-    # TODO: To configure using Meltano, declare settings and their types here:
-    - name: username
-    - name: password
+    - name: api_key
       kind: password
-    - name: start_date
-      value: '2010-01-01T00:00:00Z'
   loaders:
   - name: target-jsonl
     variant: andyh1203

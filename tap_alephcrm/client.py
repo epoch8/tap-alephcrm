@@ -22,9 +22,10 @@ class alephcrmStream(RESTStream):
     def url_base(self) -> str:
         """Return the API URL root, configurable via tap settings."""
         # TODO: hardcode a value here, or retrieve it from self.config
-        return "https://api.mysample.com"
+        return "https://api.alephcrm.com"
 
-    records_jsonpath = "$[*]"  # Or override `parse_response`.
+    # records_jsonpath = "$[*]"  # Or override `parse_response`.
+    records_jsonpath = "$.Results[*]"  # Or override `parse_response`.
 
     # Set this value or override `get_new_paginator`.
     next_page_token_jsonpath = "$.next_page"  # noqa: S105
@@ -38,9 +39,9 @@ class alephcrmStream(RESTStream):
         """
         return APIKeyAuthenticator.create_for_stream(
             self,
-            key="x-api-key",
-            value=self.config.get("auth_token", ""),
-            location="header",
+            key="api_key",
+            value=self.config.get("api_key", ""),
+            location="params"
         )
 
     @property
