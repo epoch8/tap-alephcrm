@@ -6,6 +6,7 @@ import typing as t
 from pathlib import Path
 
 from singer_sdk import typing as th  # JSON Schema typing helpers
+from singer_sdk.pagination import BaseOffsetPaginator
 
 from tap_alephcrm.client import alephcrmStream
 
@@ -115,3 +116,120 @@ class StoresStream(AccountsStream):
         th.Property("Name", th.StringType),
         th.Property("BusinessName", th.StringType)
     ).to_dict()
+
+
+class MyPaginator(BaseOffsetPaginator):
+    def has_more(self, response):
+        data = response.json()
+        limit = data.get("Paging", {}).get("Limit", {})
+        offset = data.get("Paging", {}).get("Offset", {})
+        total = data.get("Paging", {}).get("Total", {})
+        return offset + limit < total
+
+
+class OrdersStream(AccountsStream):
+    name = "orders"
+    path = "/v2/orders"
+    primary_keys: t.ClassVar[list[str]] = ["Id"]
+    replication_key = None
+
+    parent_stream_type = AccountsStream
+    ignore_parent_replication_keys = True
+
+    schema = th.PropertiesList(
+        th.Property("accountId", th.IntegerType),
+        th.Property("Id", th.IntegerType),
+        th.Property("ExternalOrderId", th.StringType),
+        th.Property("PackId", th.StringType),
+        th.Property("SourcePackId", th.StringType),
+        th.Property("IsCompletePackOrder", th.BooleanType),
+        th.Property(
+            "SellerAccount",
+            th.ObjectType(
+                th.Property("Id", th.IntegerType),
+                th.Property("OwnCode", th.StringType),
+                th.Property("Name", th.StringType),
+                th.Property("BusinessName", th.StringType)
+            )
+        ),
+        th.Property(
+            "Items",
+            th.ArrayType(
+                th.ObjectType(
+                    th.Property("Id", th.IntegerType),
+                    th.Property(
+                        "Type",
+                        th.ObjectType(
+                            th.Property("Key", th.IntegerType),
+                            th.Property("Value", th.StringType)
+                        )
+                    ),
+                    th.Property("ParentItemId", th.IntegerType),
+                    th.Property(
+                        "Product",
+                        th.ObjectType(
+                            th.Property("Id", th.IntegerType),
+                            th.Property("Sku", th.StringType),
+                            th.Property("Brand", th.StringType),
+                            th.Property("SellerSku", th.StringType),
+                            th.Property("EAN", th.StringType),
+                            th.Property(
+                                "Attributes",
+                                th.ObjectType(
+                                    th.Property(
+                                        "NetWeight",
+                                        th.ObjectType(
+                                            th.Property("Key", th.StringType),
+                                            th.Property("Value", th.IntegerType)
+                                        )
+                                    ),
+                                    th.Property(
+                                        "SalesTags",
+                                        th.ObjectType(
+                                            th.Property("Text", th.StringType),
+                                            th.Property(
+                                                "Items",
+                                                th.ArrayType(th.StringType)
+                                            ),
+                                            th.Property("Delimiter", th.StringType)
+                                        )
+                                    )
+                                )
+                            ),
+                            th.Property("Title", th.StringType),
+                            th.Property("IntegrationCode", th.StringType),
+                            th.Property(
+                                "Category",
+                                th.ObjectType(
+                                    th.Property("Key", th.StringType),
+                                    th.Property("Key", th.StringType)
+                                )
+                            )
+                        )
+                    ),
+                    th.Property(
+                        "ProductListing",
+                        th.ObjectType(
+                            th.Property("Reference", th.StringType),
+                            th.Property("Id", th.IntegerType),
+                            th.Property()
+                        )
+                    )
+                )
+            )
+        )
+    ).to_dict()
+
+    def get_new_paginator(self):
+        return MyPaginator(start_value=0, page_size=100)
+
+    def get_url_params(self, context, next_page_token):
+        params = {
+            "accountId": context["accountId"]
+        }
+
+        # Next page token is an offset
+        if next_page_token:
+            params["offset"] = next_page_token
+
+        return params
