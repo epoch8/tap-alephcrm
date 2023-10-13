@@ -41,7 +41,8 @@ class Tapalephcrm(Tap):
             streams.AccountsStream(self),
             streams.MarketplacesStream(self),
             streams.StoresStream(self),
-            streams.OrdersStream(self)
+            streams.OrdersStream(self),
+            streams.ProductsStream(self)
         ]
 
 
