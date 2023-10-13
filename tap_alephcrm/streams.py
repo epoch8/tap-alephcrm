@@ -10,9 +10,9 @@ from singer_sdk.pagination import BaseOffsetPaginator
 
 from tap_alephcrm.client import alephcrmStream
 
-from schemas.StoresStream import schema as schema__StoresStream
-from schemas.OrdersStream import schema as schema__OrdersStream
-from schemas.ProductsStream import schema as schema__ProductsStream
+from .schemas.StoresStream import schema as schema__StoresStream
+from .schemas.OrdersStream import schema as schema__OrdersStream
+from .schemas.ProductsStream import schema as schema__ProductsStream
 
 
 class AccountsStream(alephcrmStream):
