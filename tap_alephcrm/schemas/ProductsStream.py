@@ -225,8 +225,8 @@ schema = th.PropertiesList(
                                     th.Property("Name", th.StringType)
                                 )
                             ),
-                            th.Property("Quantity", th.IntegerType)
-                            # th.Property("ExternalIds", th.CustomType)
+                            th.Property("Quantity", th.IntegerType),
+                            th.Property("ExternalIds", th.StringType)
                         )
                     )
                 )

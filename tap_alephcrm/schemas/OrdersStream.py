@@ -488,7 +488,7 @@ schema = th.PropertiesList(
             )
         )
     ),
-    # th.Property("ExternalJson", th.CustomType),
+    th.Property("ExternalJson", th.StringType),
     th.Property("Integrated", th.BooleanType),
     th.Property("IntegratedOrderId", th.StringType),
     th.Property("ErpStatus", th.StringType),
