@@ -30,7 +30,7 @@ class AccountsStream(alephcrmStream):
     ).to_dict()
 
 
-    def get_child_context(self, record: dict, context: Optional[dict]) -> dict:
+    def get_child_context(self, record: dict, context: t.Optional[dict]) -> dict:
         """Return a context dictionary for child streams."""
         return {
             "accountId": record["Id"]
