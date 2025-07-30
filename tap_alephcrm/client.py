@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Callable, Iterable
+from typing import Any, Callable, Iterable, Generator
 
 import requests
+import backoff
 from singer_sdk.authenticators import APIKeyAuthenticator
 from singer_sdk.helpers.jsonpath import extract_jsonpath
 from singer_sdk.pagination import BaseAPIPaginator  # noqa: TCH002
@@ -43,6 +44,12 @@ class alephcrmStream(RESTStream):
             value=self.config.get("api_key", ""),
             location="params"
         )
+
+    def backoff_wait_generator(self) -> Generator[float, None, None]:
+        return backoff.constant(120)
+
+    def backoff_max_tries(self) -> int:
+        return 100
 
     @property
     def http_headers(self) -> dict:
