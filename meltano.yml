@@ -19,7 +19,15 @@ plugins:
     settings:
     - name: api_key
       kind: password
+    select:
+    - accounts.*
+    - marketplaces.*
+    - stores.*
+    - orders.*
+    - products.*
   loaders:
   - name: target-jsonl
     variant: andyh1203
     pip_url: target-jsonl
+    config:
+      destination_path: output/
