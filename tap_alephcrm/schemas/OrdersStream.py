@@ -201,8 +201,8 @@ schema = th.PropertiesList(
                     "Discounts",
                     th.ArrayType(
                         th.ObjectType(
-                            th.Property("Amount", th.IntegerType),
-                            th.Property("Value", th.IntegerType),
+                            th.Property("Amount", th.NumberType),
+                            th.Property("Value", th.NumberType),
                             th.Property("Type", th.StringType),
                             th.Property("Priority", th.StringType),
                             th.Property("Notes", th.StringType),
