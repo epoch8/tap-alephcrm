@@ -213,7 +213,7 @@ schema = th.PropertiesList(
                 th.Property(
                     "Taxes",
                     th.ObjectType(
-                        th.Property("Amount", th.IntegerType),
+                        th.Property("Amount", th.NumberType),
                         th.Property("CurrencySymbol", th.StringType)
                     )
                 ),

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import typing as t
 from pathlib import Path
+from datetime import datetime
 
 from singer_sdk import typing as th  # JSON Schema typing helpers
 from singer_sdk.pagination import BaseOffsetPaginator
@@ -37,10 +38,10 @@ class AccountsStream(alephcrmStream):
         }
 
 
-class MarketplacesStream(AccountsStream):
+class MarketplacesStream(alephcrmStream):
     name = "marketplaces"
     path = "/v2/accounts/{accountId}/marketplaces"
-    primary_keys: t.ClassVar[list[str]] = ["Id"]
+    primary_keys: t.ClassVar[list[str]] = ["accountId", "Id"]
     replication_key = None
 
     parent_stream_type = AccountsStream
@@ -53,10 +54,10 @@ class MarketplacesStream(AccountsStream):
     ).to_dict()
 
 
-class StoresStream(AccountsStream):
+class StoresStream(alephcrmStream):
     name = "stores"
     path = "/v2/accounts/{accountId}/stores"
-    primary_keys: t.ClassVar[list[str]] = ["Id"]
+    primary_keys: t.ClassVar[list[str]] = ["accountId", "Id"]
     replication_key = None
 
     parent_stream_type = AccountsStream
@@ -74,11 +75,13 @@ class MyPaginator(BaseOffsetPaginator):
         return offset + limit < total
 
 
-class OrdersStream(AccountsStream):
+class OrdersStream(alephcrmStream):
     name = "orders"
     path = "/v2/orders"
-    primary_keys: t.ClassVar[list[str]] = ["Id"]
-    replication_key = None
+    primary_keys: t.ClassVar[list[str]] = ["accountId", "Id"]
+    replication_key = "DateCreated"
+    STATE_MSG_FREQUENCY = 100
+    is_sorted = True
 
     parent_stream_type = AccountsStream
     ignore_parent_replication_keys = True
@@ -92,8 +95,14 @@ class OrdersStream(AccountsStream):
 
     def get_url_params(self, context, next_page_token):
         params = {
-            "accountId": context["accountId"]
+            "accountId": context["accountId"],
+            "sort": "dateCreated",
         }
+
+        if (replication_key_value := self.get_starting_replication_key_value(context=context)) is not None:
+            replication_key_value = datetime.strptime(replication_key_value, "%Y-%m-%dT%H:%M:%SZ")
+            replication_key_value = datetime.strftime(replication_key_value, "%Y-%m-%d %H:%M")
+            params["dateCreatedFrom"] = replication_key_value
 
         # Next page token is an offset
         if next_page_token:
@@ -102,10 +111,10 @@ class OrdersStream(AccountsStream):
         return params
 
 
-class ProductsStream(AccountsStream):
+class ProductsStream(alephcrmStream):
     name = "products"
     path = "/v2/products"
-    primary_keys: t.ClassVar[list[str]] = ["Id"]
+    primary_keys: t.ClassVar[list[str]] = ["accountId", "Id"]
     replication_key = None
 
     parent_stream_type = AccountsStream

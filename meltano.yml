@@ -20,11 +20,27 @@ plugins:
     - name: api_key
       kind: password
     select:
-    - accounts.*
-    - marketplaces.*
-    - stores.*
-    - orders.*
-    - products.*
+      - "accounts.*"
+      - "marketplaces.*"
+      - "orders.*"
+      - "!orders.Buyer*"
+      - "!orders.Shipping*"
+      - "!orders.Documents*"
+      - "stores.*"
+      - "products.*"
+    metadata:
+      accounts:
+        table-key-properties: [Id]
+      marketplaces:
+        table-key-properties: [accountId, Id]
+      orders:
+        table-key-properties: [accountId, Id]
+        replication-method: INCREMENTAL
+        replication-key: DateCreated
+      stores:
+        table-key-properties: [accountId, Id]
+      products:
+        table-key-properties: [accountId, Id]
   loaders:
   - name: target-jsonl
     variant: andyh1203
