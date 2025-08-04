@@ -5,6 +5,7 @@ from __future__ import annotations
 import typing as t
 from pathlib import Path
 from datetime import datetime
+import logging
 
 from singer_sdk import typing as th  # JSON Schema typing helpers
 from singer_sdk.pagination import BaseOffsetPaginator
@@ -14,6 +15,9 @@ from tap_alephcrm.client import alephcrmStream
 from .schemas.StoresStream import schema as schema__StoresStream
 from .schemas.OrdersStream import schema as schema__OrdersStream
 from .schemas.ProductsStream import schema as schema__ProductsStream
+
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
 class AccountsStream(alephcrmStream):
@@ -108,6 +112,7 @@ class OrdersStream(alephcrmStream):
         if next_page_token:
             params["offset"] = next_page_token
 
+        logging.info(f"Stream \"{self.name}\" URL params:\t{params}")
         return params
 
 
