@@ -85,7 +85,7 @@ class OrdersStream(alephcrmStream):
     primary_keys: t.ClassVar[list[str]] = ["accountId", "Id"]
     replication_key = "DateCreated"
     STATE_MSG_FREQUENCY = 100
-    is_sorted = True
+    is_sorted = False
 
     parent_stream_type = AccountsStream
     ignore_parent_replication_keys = True
