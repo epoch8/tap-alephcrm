@@ -28,6 +28,14 @@ class Tapalephcrm(Tap):
             required=True,
             secret=True,  # Flag config as protected.
             description="The token to authenticate against the API service",
+        ),
+        th.Property(
+            "retro_days",
+            th.IntegerType,
+            required=False,
+            secret=False,
+            default=0,
+            description="Number of days to reload previous data",
         )
     ).to_dict()
 

@@ -5,6 +5,7 @@ from __future__ import annotations
 import typing as t
 from pathlib import Path
 from datetime import datetime
+from datetime import timedelta
 import logging
 
 from singer_sdk import typing as th  # JSON Schema typing helpers
@@ -105,6 +106,8 @@ class OrdersStream(alephcrmStream):
 
         if (replication_key_value := self.get_starting_replication_key_value(context=context)) is not None:
             replication_key_value = datetime.strptime(replication_key_value, "%Y-%m-%dT%H:%M:%SZ")
+            if (retro_days := self.config.get("retro_days")) > 0:
+                replication_key_value = replication_key_value - timedelta(days=retro_days)
             replication_key_value = datetime.strftime(replication_key_value, "%Y-%m-%d %H:%M")
             params["dateCreatedFrom"] = replication_key_value
 

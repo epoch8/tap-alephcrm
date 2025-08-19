@@ -19,6 +19,9 @@ plugins:
     settings:
     - name: api_key
       kind: password
+    - name: retro_days
+    config:
+      retro_days: 7
     select:
       - "accounts.*"
       - "marketplaces.*"
